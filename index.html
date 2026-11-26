@@ -293,10 +293,18 @@ function vUI(){
   return {sec:V,type:'multi',none:true,q:'The developer was asked to copy Design A exactly. Click every element in Build B that is different.',body:`<div class="two"><div><h4>Design A</h4>${mock(p,false)}</div><div><h4>Build B (click here)</h4>${mock(q,true)}</div></div>`,ans:sortN(idx)};
 }
 function vMirror(flipV){
-  const on=shuf([...Array(25).keys()]).slice(0,8),m=on.map(i=>{const r=Math.floor(i/5),c=i%5;return flipV?(4-r)*5+c:r*5+(4-c)});
-  const g=`<svg viewBox="0 0 100 100" class="mini">${[...Array(25).keys()].map(k=>`<rect x="${(k%5)*20+2}" y="${Math.floor(k/5)*20+2}" width="16" height="16" rx="3" ${on.includes(k)?'fill="currentColor"':'fill="none" stroke="currentColor" stroke-opacity=".35"'}/>`).join('')}</svg>`;
-  const cells=[...Array(25).keys()].map(i=>`<button class="cell pick" data-i="${i}" aria-label="Cell ${i+1}"></button>`).join('');
-  return {sec:V,type:'multi',q:flipV?'Draw the original turned <b>upside down</b> (flipped top to bottom). Click the cells to fill them.':'Draw the <b>mirror image</b> of the original (flipped left to right). Click the cells to fill them.',body:`<div class="pat"><div><h4>Original</h4>${g}</div><div><h4>Your drawing</h4><div class="grid" style="--c:5;width:200px">${cells}</div></div></div>`,ans:sortN(m)};
+  const key=a=>a.slice().sort((x,y)=>x-y).join();
+  let on,h,v,m;
+  for(let t=0;t<50;t++){
+    on=shuf([...Array(25).keys()]).slice(0,8);
+    h=on.map(i=>Math.floor(i/5)*5+(4-i%5));v=on.map(i=>(4-Math.floor(i/5))*5+i%5);
+    if(new Set([key(on),key(h),key(v)]).size===3)break;
+  }
+  const right=flipV?v:h,wrongAxis=flipV?h:v;
+  let near;for(let t=0;t<100;t++){const rm=pick(right),r=Math.floor(rm/5),c=rm%5,nb=[rm-5,rm+5,c?rm-1:-1,c<4?rm+1:-1].filter(x=>x>=0&&x<25&&!right.includes(x));if(!nb.length)continue;near=right.filter(x=>x!==rm).concat(pick(nb));if(![key(on),key(wrongAxis),key(right)].includes(key(near)))break}
+  const g=(s,cls)=>`<svg viewBox="0 0 100 100" class="${cls}">${[...Array(25).keys()].map(k=>`<rect x="${(k%5)*20+2}" y="${Math.floor(k/5)*20+2}" width="16" height="16" rx="3" ${s.includes(k)?'fill="currentColor"':'fill="none" stroke="currentColor" stroke-opacity=".35"'}/>`).join('')}</svg>`;
+  const all=[right,on,wrongAxis,near],order=shuf([0,1,2,3]);
+  return {sec:V,type:'mcq',q:flipV?'Which option is the original turned <b>upside down</b> (flipped top to bottom)?':'Which option is the <b>mirror image</b> of the original (flipped left to right)?',body:`<div class="pat"><div><h4>Original</h4>${g(on,'mini')}</div></div><div class="opts pics">${order.map((i,k)=>`<button class="opt pick" data-i="${k}" aria-label="Option ${k+1}">${g(all[i],'')}</button>`).join('')}</div>`,ans:order.indexOf(0)};
 }
 const PLAN=[tRecord,tRecord,tCodes,tSpell,tSpell,tSort,tInvoice,tConfig,tEmail,tDup,vChars,vChars,vColour,vColour,vShape,vShape,vCount,vUI,()=>vMirror(false),()=>vMirror(true)];
 function build1(){
