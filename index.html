@@ -52,7 +52,7 @@ a{color:inherit}
 .rec{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--soft)}
 .rec p{margin:0 0 4px;display:grid;grid-template-columns:6.5em minmax(0,1fr);gap:8px;padding:4px 6px;border-radius:6px}
 .rec span{color:var(--mute);font-size:14px}
-.rec b{font-weight:500;font-family:"IBM Plex Mono",monospace;font-size:15px;overflow-wrap:anywhere}
+.rec b{font-weight:500;font-size:15px;overflow-wrap:anywhere}
 .scroll{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:15px}
 th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
@@ -123,6 +123,16 @@ tr.pick.on{outline:0!important}
 .tinput{width:100%;max-width:420px;font:18px "IBM Plex Mono",monospace;padding:12px;border:2px solid var(--ink);border-radius:8px;background:var(--bg);color:var(--ink);margin-top:18px}
 .hint{margin:-8px 0 16px}
 .nonebtn{margin-top:14px}
+.wrap.wide{max-width:1400px}
+main.wrap.wide{max-width:calc(1400px + 10vw)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.tab{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:8px 14px;font-size:14px}
+.tab.on{background:var(--ink);color:var(--bg);outline:0!important}
+.codegrid{display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
+@media(min-width:1100px){.codegrid{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}}
+.spec{border:1px solid var(--line);border-radius:10px;padding:16px 18px;background:var(--soft);font-size:15px;max-height:72vh;overflow:auto}
+.spec h2{margin-bottom:4px}.spec ul{padding-left:20px;margin:8px 0}.spec li{margin-bottom:6px}.spec p{margin:8px 0}.spec pre{background:var(--bg)}
+.editor{width:100%;min-height:62vh;font:14px/1.6 "IBM Plex Mono",ui-monospace,monospace;padding:14px;border:2px solid var(--ink);border-radius:10px;background:var(--bg);color:var(--ink);tab-size:2;white-space:pre;overflow:auto;resize:vertical}
 .ok{color:#16a34a}.bad{color:var(--red)}
 .parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(14em,1fr));gap:12px;margin:18px 0 0}
 .parts div{border:1px solid var(--line);border-radius:10px;padding:14px}
@@ -158,7 +168,7 @@ async function post(action,data,tries=3){
 }
 function beacon(reason){
   if(!S.id)return;
-  const body=JSON.stringify({action:'fail',id:S.id,reason});
+  const body=JSON.stringify(Object.assign({action:'fail',id:S.id,reason},S.code?{code:S.code,tel:S.tel}:{}));
   try{if(navigator.sendBeacon&&navigator.sendBeacon(API,new Blob([body],{type:'text/plain;charset=utf-8'})))return}catch(_){}
   try{fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body,keepalive:true}).catch(()=>{})}catch(_){}
 }
@@ -166,9 +176,9 @@ function beacon(reason){
 const head=(t,sub,bg)=>`<section class="band head"${bg?` style="background:${bg}"`:''}><div class="wrap"><p class="brand">${sub||'Linnk'}</p><h1>${t}</h1></div></section>`;
 function viewStart(){
   const opts=Object.entries(ROLES).map(([k,r])=>`<option value="${k}">${esc(r.name)}</option>`).join('');
-  return `<section class="band head"><div class="wrap"><p class="brand">Linnk</p><h1>Candidate assessment</h1><p class="lead">Two timed parts taken in one sitting. Part 1 checks how carefully you read, compare and spot differences. Part 2 tests the technical skills for the role you applied for.</p><div class="facts"><div><span class="big">40</span>questions</div><div><span class="big">50 min</span>total (20 + 30)</div><div><span class="big">1</span>attempt</div></div></div></section>
-  <main class="wrap"><div class="startgrid"><div><h2>Strict rules, please read</h2><ul class="rules"><li><b>The test ends immediately and is marked as a fail if you</b> switch tabs, click outside this window, minimise it, leave full screen, reload the page, or try to take a screenshot.</li><li>Before you start, close other apps and chat windows and turn on Do Not Disturb so no pop-up takes you away from the page.</li><li>You get one attempt per email address. Timers do not pause and you cannot go back to a question.</li><li>A question only scores if your whole answer is right. If there are three differences, you must find all three and nothing else.</li><li>Copy, paste and right-click are switched off.</li><li>Use a laptop or desktop with Chrome, Edge or Firefox and a stable internet connection. Your questions are generated just for you.</li><li>Do not use AI tools, search engines or other people. Your answers will be discussed in the interview.</li><li>Your answers are sent to Linnk when you finish. Your consultant will be in touch with the outcome.</li></ul>
-  <h3>The two parts</h3><div class="parts"><div><b>Part 1: Attention to detail</b>20 questions, 20 minutes. Find every difference or mistake by clicking it. Some questions have none.</div><div><b>Part 2: Technical</b>20 questions, 30 minutes. Find bugs in real code, type answers, and scenario questions based on the role.</div></div></div>
+  return `<section class="band head"><div class="wrap"><p class="brand">Linnk</p><h1>Candidate assessment</h1><p class="lead">Two timed parts taken in one sitting. Part 1 checks how carefully you read, compare and spot differences. Part 2 is hands-on coding for the role you applied for.</p><div class="facts"><div><span class="big">2</span>parts</div><div><span class="big">65 min</span>total (20 + 45)</div><div><span class="big">1</span>attempt</div></div></div></section>
+  <main class="wrap"><div class="startgrid"><div><h2>Strict rules, please read</h2><ul class="rules"><li><b>The test ends immediately and is marked as a fail if you</b> switch tabs, click outside this window, minimise it, leave full screen, reload the page, or try to take a screenshot.</li><li>Before you start, close other apps and chat windows and turn on Do Not Disturb so no pop-up takes you away from the page.</li><li>You get one attempt per email address. Timers do not pause and you cannot go back to a question.</li><li>In part 1 a question only scores if your whole answer is right. If there are three differences, you must find all three and nothing else.</li><li>In part 2 you write code in the browser. Pasting is switched off, so type your own solution. Your code is saved automatically and reviewed by the hiring team.</li><li>Copy, paste and right-click are switched off.</li><li>Use a laptop or desktop with Chrome, Edge or Firefox and a stable internet connection. Your questions are generated just for you.</li><li>Do not use AI tools, search engines or other people. Your answers will be discussed in the interview.</li><li>Your answers are sent to Linnk when you finish. Your consultant will be in touch with the outcome.</li></ul>
+  <h3>The two parts</h3><div class="parts"><div><b>Part 1: Attention to detail</b>20 questions, 20 minutes. Find every difference or mistake by clicking it. Some questions have none.</div><div><b>Part 2: Hands-on coding</b>3 tasks, 45 minutes, in the role's own language. Move between tasks freely. Working, clean, well-handled code scores best.</div></div></div>
   <form id="f" novalidate><label for="rl">Role you applied for</label><select id="rl"><option value="">Select your role</option>${opts}</select><label for="nm">Full name</label><input id="nm" type="text" autocomplete="name"><label for="em">Email (the one you applied with)</label><input id="em" type="email" autocomplete="email"><label class="agree"><input id="ag" type="checkbox">I have read the rules and will complete this test on my own in one sitting.</label><p class="err" id="err"></p><button class="go" type="submit" id="sb">Start the test</button></form></div></main>`;
 }
 function curQs(){return S.part===1?S.qs1:S.qs2}
@@ -182,24 +192,42 @@ function viewQ(){
 }
 function viewBusy(){return head(S.busyTitle||'Please wait',S.busySub||'Linnk')+`<main class="wrap test"><p>${esc(S.busyMsg||'Saving your answers. Do not close or leave this page.')}</p>${S.retry?'<button class="go" id="retry">Try again</button>':''}</main>`}
 function viewBreak(){
-  return `<section class="band head"><div class="wrap"><p class="brand">Part 1 complete</p><h1>Part 2: Technical</h1><p class="lead">20 questions in 30 minutes on ${esc(ROLES[S.role].name)} skills: ${esc(ROLES[S.role].skills)}. Stay on this page. The same rules apply.</p></div></section>
+  return `<section class="band head"><div class="wrap"><p class="brand">Part 1 complete</p><h1>Part 2: Hands-on coding</h1><p class="lead">3 coding tasks in 45 minutes for the ${esc(ROLES[S.role].name)} role. You can switch between tasks at any time. Pasting is off and your code saves automatically. Stay on this page. The same rules apply.</p></div></section>
   <main class="wrap test"><p>Part 2 starts automatically in <b id="cd">45</b> seconds.</p><button class="go" id="p2">Start part 2 now</button></main>`;
 }
 function viewDone(){
   if(S.reason)return `<section class="band head" style="background:#ffd0d2"><div class="wrap"><p class="brand">Test ended${S.name?', '+esc(S.name):''}</p><h1><span class="big" style="font-size:clamp(48px,8vw,80px)">Test failed</span></h1><p class="lead">The test stopped because you ${REASON[S.reason]||'broke a test rule'}. This has been recorded and sent to Linnk.</p></div></section><main class="wrap"><p>If this happened for a genuine reason, contact your Linnk consultant.</p><p class="small" style="margin-top:32px"><a href="#" id="again">Your consultant approved a retake? Start again</a></p></main>`;
   return `<section class="band head"><div class="wrap"><p class="brand">Thank you${S.name?', '+esc(S.name):''}</p><h1>Assessment submitted</h1><p class="lead">Your answers have been sent to Linnk. Your consultant will be in touch with the outcome.</p></div></section><main class="wrap"><p class="small">You can close this page now.</p><p class="small" style="margin-top:32px"><a href="#" id="again">Your consultant approved a retake? Start again</a></p></main>`;
 }
+function md(t){
+  return t.split(/```/).map((chunk,k)=>{
+    if(k%2)return `<pre>${esc(chunk.replace(/^\w*\n/,''))}</pre>`;
+    const lines=chunk.split('\n');let h='',ul=false;
+    const il=x=>esc(x).replace(/`([^`]+)`/g,'<code>$1</code>');
+    lines.forEach(l=>{if(/^\s*- /.test(l)){if(!ul){h+='<ul>';ul=true}h+=`<li>${il(l.replace(/^\s*- /,''))}</li>`}else{if(ul){h+='</ul>';ul=false}if(l.trim())h+=`<p>${il(l)}</p>`}});
+    if(ul)h+='</ul>';return h}).join('');
+}
+function viewCode(){
+  const t=S.tasks[S.ti];
+  return `<section class="band head slim"><div class="wrap wide"><div class="bar"><div><p class="brand">Part 2 of 2 · Hands-on coding</p><p class="sec">${esc(ROLES[S.role].name)} · <span id="saved">Autosave on</span></p></div><div id="clock" class="clock">--:--</div></div></div></section>
+  <main class="wrap wide test"><div class="tabs">${S.tasks.map((x,i)=>`<button class="tab${i===S.ti?' on':''}" data-task="${i}">Task ${i+1}: ${esc(x.title)}</button>`).join('')}</div>
+  <div class="codegrid"><section class="spec"><h2>${esc(t.title)}</h2><p class="small">${esc(t.lang)}</p>${md(t.spec)}</section>
+  <section><textarea class="editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" aria-label="Code editor for task ${S.ti+1}">${esc(S.code[S.ti])}</textarea><div class="row" style="justify-content:space-between"><span class="small">Tab indents. Pasting is off. All 3 tasks are submitted together.</span><button class="go" id="submit">Submit all tasks</button></div></section></div></main>`;
+}
+function switchTask(i){const ta=document.querySelector('.editor');if(ta)S.code[S.ti]=ta.value;S.ti=i;autosave();render();const e=document.querySelector('.editor');if(e)e.focus()}
+async function autosave(){if(S.phase!=='code')return;S.lastSave=Date.now();const r=await post('save',{id:S.id,code:S.code,tel:S.tel},1);const el=document.getElementById('saved');if(el)el.textContent=r.ok?'Saved '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):'Not saved yet, retrying'}
 function viewMsg(){return head(esc(S.msgTitle||'Something went wrong'))+`<main class="wrap"><p>${esc(S.msg||'')}</p></main>`}
 function render(){
   save();
-  app.innerHTML=S.phase==='test'?viewQ():S.phase==='break'?viewBreak():S.phase==='busy'?viewBusy():S.phase==='done'?viewDone():S.phase==='msg'?viewMsg():viewStart();
+  app.innerHTML=S.phase==='code'?viewCode():S.phase==='test'?viewQ():S.phase==='break'?viewBreak():S.phase==='busy'?viewBusy():S.phase==='done'?viewDone():S.phase==='msg'?viewMsg():viewStart();
   if(S.phase==='test')paint();
   tick();window.scrollTo(0,0);
 }
 function remain(){return Math.max(0,S.limit-Math.floor((Date.now()-S.t0)/1000))}
 function tick(){
   if(S.phase==='break'){const left=Math.max(0,S.brk-Math.floor((Date.now()-S.tb)/1000)),c=document.getElementById('cd');if(c)c.textContent=left;if(left<=0)startPart2();return}
-  if(S.phase!=='test')return;
+  if(S.phase==='code'){const n=Date.now();if(S.tel&&document.hasFocus())S.tel[S.ti].ms+=n-(S.lastTick||n);S.lastTick=n;if(n-S.lastSave>45000)autosave()}
+  if(S.phase!=='test'&&S.phase!=='code')return;
   const r=remain(),c=document.getElementById('clock');
   if(c){c.textContent=mmss(r);c.classList.toggle('low',r<120)}
   if(r<=0)endPart();
@@ -221,17 +249,17 @@ function pickItem(i){
 }
 function busy(title,msg){S.phase='busy';S.busyTitle=title;S.busyMsg=msg;S.retry=false;render()}
 async function endPart(){
-  if(S.phase!=='test')return;
+  if(S.phase!=='test'&&S.phase!=='code')return;
   if(S.part===1){
     busy('Saving part 1','Saving your answers and preparing part 2. Do not close or leave this page.');
     const r=await post('part1',{id:S.id,answers:S.ans1},5);
     if(S.phase!=='busy')return;
     if(r.error==='network'){S.retry='part1';S.busyMsg='We could not reach the server. Check your connection and click Try again. Do not close this page.';render();return}
     if(r.error){S.phase='done';S.reason=r.error==='time'?7:(S.reason||0);if(!S.reason){S.phase='msg';S.msgTitle='This attempt has ended';S.msg='Your attempt could not continue. Contact your Linnk consultant.'}render();return}
-    S.qs2=r.qs;S.limit2=r.limit;S.brk=r.brk||45;S.phase='break';S.tb=Date.now();render();
+    S.tasks=r.tasks;S.code=r.tasks.map(t=>t.starter);S.tel=r.tasks.map(()=>({keys:0,dels:0,ms:0,paste:0}));S.ti=0;S.limit2=r.limit;S.brk=r.brk||45;S.phase='break';S.tb=Date.now();render();
   }else{
     busy('Submitting','Sending your answers to Linnk. Do not close or leave this page.');
-    const r=await post('finish',{id:S.id,answers:S.ans2,brk:S.brkUsed||0},5);
+    const r=await post('finish',{id:S.id,code:S.code,tel:S.tel,brk:S.brkUsed||0},5);
     if(S.phase!=='busy')return;
     if(r.error==='network'){S.retry='finish';S.busyMsg='We could not reach the server. Check your connection and click Try again. Do not close this page.';render();return}
     S.phase='done';S.reason=0;exitFs();render();
@@ -240,10 +268,10 @@ async function endPart(){
 function startPart2(){
   if(S.phase!=='break')return;
   S.brkUsed=Math.round((Date.now()-S.tb)/1000);
-  S.phase='test';S.part=2;S.ans2=[];S.i=0;S.sel=null;S.t0=Date.now();S.limit=S.limit2;render();
+  S.phase='code';S.part=2;S.ti=0;S.t0=Date.now();S.limit=S.limit2;S.lastTick=Date.now();S.lastSave=Date.now();render();
 }
 function exitFs(){try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(_){}}
-const live=()=>['test','break','busy'].includes(S.phase)&&S.id;
+const live=()=>['test','break','busy','code'].includes(S.phase)&&S.id;
 function violate(r){
   if(!live()||Date.now()<(S.grace||0))return;
   S.reason=r;S.phase='done';beacon(r);exitFs();render();
@@ -268,7 +296,11 @@ document.addEventListener('submit',async e=>{
 document.addEventListener('click',e=>{
   if(e.target.closest('#p2')){startPart2();return}
   if(e.target.closest('#again')){e.preventDefault();S={phase:'start'};render();return}
-  if(e.target.closest('#retry')){const w=S.retry;S.retry=false;S.phase='test';S.i=curQs().length-1;if(w)endPart();return}
+  if(e.target.closest('#retry')){const w=S.retry;S.retry=false;S.phase=w==='finish'?'code':'test';if(w==='part1')S.i=curQs().length-1;if(w)endPart();return}
+  if(S.phase==='code'){
+    const tb=e.target.closest('[data-task]');if(tb){switchTask(+tb.dataset.task);return}
+    if(e.target.closest('#submit')){const b=document.getElementById('submit');if(b.dataset.armed){endPart()}else{b.dataset.armed='1';b.textContent='Click again to submit all 3 tasks';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent='Submit all tasks'}},5000)}return}
+  }
   if(S.phase==='test'){
     const c=e.target.closest('#qb [data-i]');if(c){pickItem(+c.dataset.i);return}
     if(e.target.closest('#next')&&ready()){
@@ -277,10 +309,21 @@ document.addEventListener('click',e=>{
       if(S.i>=curQs().length){S.i--;endPart()}else render();return}
   }
 });
-document.addEventListener('input',e=>{if(e.target.id==='ta'){const b=document.getElementById('next');if(b)b.disabled=!ready()}});
+document.addEventListener('input',e=>{if(e.target.classList&&e.target.classList.contains('editor')){S.code[S.ti]=e.target.value;return}if(e.target.id==='ta'){const b=document.getElementById('next');if(b)b.disabled=!ready()}});
 document.addEventListener('keydown',e=>{if(e.target.id==='ta'&&e.key==='Enter'){e.preventDefault();const b=document.getElementById('next');if(b&&!b.disabled)b.click()}});
+document.addEventListener('keydown',e=>{
+  if(S.phase!=='code'||!(e.target.classList&&e.target.classList.contains('editor')))return;
+  const ta=e.target,t=S.tel[S.ti];
+  if((e.ctrlKey||e.metaKey)&&(e.key||'').toLowerCase()==='v'){t.paste++;return}
+  if(e.key.length===1||e.key==='Enter'||e.key==='Tab')t.keys++;
+  if(e.key==='Backspace'||e.key==='Delete')t.dels++;
+  if(e.key==='Tab'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();ins(ta,'  ')}
+  else if(e.key==='Enter'&&!e.ctrlKey&&!e.metaKey){e.preventDefault();const v=ta.value,p=ta.selectionStart,ls=v.lastIndexOf('\n',p-1)+1,ind=(v.slice(ls,p).match(/^\s*/)||[''])[0],extra=/[{(\[]\s*$/.test(v.slice(ls,p))?'  ':'';ins(ta,'\n'+ind+extra)}
+});
+function ins(ta,txt){const a=ta.selectionStart,b=ta.selectionEnd;ta.setRangeText(txt,a,b,'end');S.code[S.ti]=ta.value}
 ['copy','cut','paste','contextmenu','dragstart','drop'].forEach(t=>document.addEventListener(t,e=>{if(live())e.preventDefault()}));
-document.addEventListener('selectstart',e=>{if(live()&&e.target.id!=='ta')e.preventDefault()});
+document.addEventListener('selectstart',e=>{if(live()&&e.target.id!=='ta'&&!(e.target.classList&&e.target.classList.contains('editor')))e.preventDefault()});
+document.addEventListener('paste',e=>{if(S.phase==='code'&&S.tel)S.tel[S.ti].paste++},true);
 document.addEventListener('keydown',e=>{
   if(!live())return;
   const k=(e.key||'').toLowerCase(),mod=e.ctrlKey||e.metaKey;
@@ -294,7 +337,7 @@ window.addEventListener('blur',()=>{setTimeout(()=>{if(!document.hasFocus())viol
 document.addEventListener('fullscreenchange',()=>{if(live()&&S.fs&&!document.fullscreenElement)violate(3)});
 window.addEventListener('pagehide',()=>{if(live()){S.reason=6;S.phase='done';save();beacon(6)}});
 const st=load();
-if(st&&['test','break','busy'].includes(st.phase)&&st.id){S={phase:'done',id:st.id,name:st.name,role:st.role,reason:6};beacon(6)}
+if(st&&['test','break','busy','code'].includes(st.phase)&&st.id){S={phase:'done',id:st.id,name:st.name,role:st.role,reason:6};beacon(6)}
 else if(st&&st.phase==='done'){S=Object.assign({},st)}
 render();setInterval(tick,500);
 }
