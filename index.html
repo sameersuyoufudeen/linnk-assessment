@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attention to Detail Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Inter:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* VOICE work: a calm, fair, timed assessment that candidates take on their own
+   IDEA a printed proof sheet: two versions side by side, find what changed
+   PICTURE the live question itself (grids, records, mock screens) large in the first screen
+   COLOUR white or black ground, black ink, one mint field for the header and selection
+   TYPE Space Grotesk 700 for figures and titles, Inter for text, Plex Mono for code
+   LAYOUT mint band on top with title and timer, one calm question column below; stacks on phone */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#0b0b0b);--ink:light-dark(#0b0b0b,#f2f2f2);--mute:light-dark(#555,#a3a3a3);--line:light-dark(#d6d6d6,#2c2c2c);--soft:light-dark(#f5f5f5,#151515);--mint:#b8f5d0;--red:#d93036}
+:root[data-theme=light]{color-scheme:light}
+:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,.big,.clock{font-family:"Space Grotesk",Inter,sans-serif;font-weight:700;letter-spacing:-.02em;line-height:1.05}
+h1{font-size:clamp(32px,5vw,50px);margin:6px 0 10px;text-wrap:balance}
+h2{font-size:clamp(20px,2.6vw,26px);margin:0 0 18px;line-height:1.2;text-wrap:balance}
+h4{margin:0 0 8px;font-size:14px;color:var(--mute);font-weight:600}
+.band{padding-block:clamp(24px,4vw,48px);padding-inline:max(5vw,16px)}
+.head{background:var(--mint);color:#0b0b0b}
+.head.slim{padding-block:16px 0}
+.wrap{max-width:900px;margin:0 auto}
+main.wrap{padding:28px max(5vw,16px) 64px;max-width:calc(900px + 10vw)}
+.brand{margin:0;font-weight:600;font-size:15px}
+.lead{max-width:62ch;margin:0;font-size:17px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(9em,1fr));gap:12px;margin-top:22px}
+.facts div{border-top:2px solid #0b0b0b;padding-top:8px}
+.big{font-size:clamp(30px,5vw,44px);display:block}
+.bar{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding-bottom:14px}
+.sec{margin:0;font-size:14px}
+.clock{font-size:clamp(30px,5vw,42px);font-variant-numeric:tabular-nums}
+.clock.low{color:var(--red)}
+.prog{height:6px;background:color-mix(in srgb,#0b0b0b 15%,transparent)}
+.prog i{display:block;height:100%;background:#0b0b0b}
+.startgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:32px}
+.rules{margin:0;padding-left:20px}
+.rules li{margin-bottom:8px}
+form label{display:block;font-weight:600;margin:0 0 6px}
+input[type=text],input[type=email]{width:100%;font:16px Inter,sans-serif;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);margin-bottom:16px}
+.agree{display:flex;gap:10px;align-items:flex-start;font-weight:400;margin-bottom:18px}
+.agree input{width:20px;height:20px;margin-top:2px;flex:none}
+button{font:inherit;color:inherit;cursor:pointer}
+.go{background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:0 26px;min-height:48px;font-weight:600}
+.go:disabled{opacity:.35;cursor:not-allowed}
+.go.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+:focus-visible{outline:3px solid #2563eb;outline-offset:2px}
+.small{font-size:14px;color:var(--mute)}
+a{color:inherit}
+.err{color:var(--red);font-size:14px;min-height:1.4em;margin:0 0 10px}
+.test{user-select:none;-webkit-user-select:none}
+.warn{background:var(--red);color:#fff;padding:10px 14px;border-radius:8px;margin-bottom:16px;font-size:15px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.rec{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--soft)}
+.rec p{margin:0 0 8px;display:grid;grid-template-columns:4.5em minmax(0,1fr);gap:8px}
+.rec span{color:var(--mute);font-size:14px}
+.rec b{font-weight:500;font-family:"IBM Plex Mono",monospace;font-size:15px;overflow-wrap:anywhere}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}
+th{font-size:13px;color:var(--mute);font-weight:600}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mono{font-family:"IBM Plex Mono",monospace}
+blockquote{margin:0;padding:16px 18px;border-left:4px solid var(--ink);background:var(--soft);font-size:18px}
+pre{margin:0;padding:12px;background:var(--soft);border:1px solid var(--line);border-radius:8px;font:14px/1.7 "IBM Plex Mono",monospace;overflow-x:auto}
+.ln{display:inline-block;width:2em;color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(var(--c),minmax(0,1fr));gap:4px}
+.cell{aspect-ratio:1;border:1px solid var(--line);background:var(--bg);border-radius:4px;padding:0;display:grid;place-items:center}
+.cell.ch{font:500 clamp(14px,2.6vw,20px)/1 Inter,sans-serif}
+.cell svg{width:70%;height:70%;fill:currentColor}
+.sw{aspect-ratio:1;border-radius:4px;border:0;padding:0}
+.on{outline:4px solid var(--ink)!important;outline-offset:1px}
+.cell.on{background:var(--mint);color:#0b0b0b}
+.pic{width:100%;height:auto;max-height:340px;border:1px solid var(--line);border-radius:10px;background:var(--soft)}
+.seq{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;max-width:520px}
+.fr{aspect-ratio:1;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center}
+.fr svg{width:70%;height:70%}
+.fr.q{font:700 32px "Space Grotesk",sans-serif;color:var(--mute);border-style:dashed}
+.pat{display:flex;gap:16px;align-items:center}
+.mini{width:120px;height:120px}
+.opts{display:grid;gap:10px;margin-top:22px}
+.opts.pics{grid-template-columns:repeat(4,minmax(0,1fr));max-width:560px}
+.opt{min-height:48px;text-align:left;padding:10px 16px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.opt:hover{border-color:var(--ink)}
+.opt.on{background:var(--ink);color:var(--bg);outline:0!important}
+.pics .opt{padding:10px;display:grid;place-items:center;aspect-ratio:1}
+.pics .opt svg{width:80%;height:80%}
+.pics .opt.on{background:var(--mint);color:#0b0b0b}
+.mock{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--soft);font-size:14px}
+.mock label{display:block;font-weight:600;margin:12px 0 4px}
+.inp{border:1px solid var(--line);border-radius:6px;padding:8px 10px;color:var(--mute);background:var(--bg)}
+.chk{margin-top:12px}
+.chk span{display:inline-block;width:14px;height:14px;border:1px solid var(--mute);border-radius:3px;margin-right:8px;vertical-align:-2px}
+.btn{background:#2563eb;color:#fff;text-align:center;padding:10px;margin-top:14px;font-weight:600}
+.mock .lk{display:block;margin-top:10px;color:#2563eb;font-size:13px;text-decoration:underline}
+.logo{display:flex;gap:8px;align-items:center;font-weight:700}
+.logo i{width:16px;height:16px;border-radius:50%}
+.nav{margin-top:28px;display:flex;justify-content:flex-end}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(10em,1fr));gap:12px;margin:0 0 24px}
+.stats div{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.stats span{display:block;font-size:14px;color:var(--mute)}
+.stats b{font:700 26px "Space Grotesk",sans-serif;font-variant-numeric:tabular-nums}
+.code{font:500 clamp(18px,3vw,24px) "IBM Plex Mono",monospace;background:var(--soft);border:1px dashed var(--ink);border-radius:8px;padding:12px 16px;display:inline-block;overflow-wrap:anywhere;user-select:all}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:16px 0}
+textarea{width:100%;font:14px "IBM Plex Mono",monospace;min-height:170px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.verdict{font:700 22px "Space Grotesk",sans-serif;margin:14px 0 0}
+.ok{color:#16a34a}.bad{color:var(--red)}
+@media(max-width:600px){.startgrid,.two{grid-template-columns:minmax(0,1fr)}table{font-size:13px}th,td{padding:6px 4px}.opts.pics{grid-template-columns:repeat(2,minmax(0,1fr))}.seq{gap:5px}.pat{flex-direction:column;align-items:flex-start}}
+@media(prefers-reduced-motion:no-preference){.prog i{transition:width .4s ease}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+{
+const RESULTS_URL='';
+const LIMIT=15*60, PASS=15, TOTAL=20, SALT='lnk-atd-26';
+const R=Math.random;
+const ri=(a,b)=>a+Math.floor(R()*(b-a+1));
+const pick=a=>a[Math.floor(R()*a.length)];
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const digits=n=>Array.from({length:n},()=>ri(0,9)).join('');
+//GEN-START
+const LOOK={'0':'O','O':'0','1':'l','l':'1','5':'S','S':'5','8':'B','B':'8','6':'G','G':'6','a':'o','o':'a','e':'c','c':'e','i':'l','n':'m','m':'n','u':'v','v':'u','h':'b'};
+function mutate(s){
+  for(let t=0;t<80;t++){
+    const op=ri(0,2),i=ri(0,s.length-1),c=s[i];let o=s;
+    if(op===0&&LOOK[c])o=s.slice(0,i)+LOOK[c]+s.slice(i+1);
+    else if(op===1&&i<s.length-1&&/[A-Za-z0-9]/.test(c)&&/[A-Za-z0-9]/.test(s[i+1])&&c!==s[i+1])o=s.slice(0,i)+s[i+1]+c+s.slice(i+2);
+    else if(op===2&&/[0-9]/.test(c))o=s.slice(0,i)+((+c+ri(1,8))%10)+s.slice(i+1);
+    if(o!==s)return o;
+  }
+  return s+'1';
+}
+const FIRST=['Mohammed','Priya','Fatima','Daniel','Aisha','Rohan','Layla','Omar','Hessa','Arjun','Mariam','Khalid'];
+const LAST=['Mansoori','Raghunathan','Hashemi','Connolly','Rahman','Kapoor','Haddad','Siddiqui','Shamsi','Menon','Nuaimi','Qassim'];
+const PAL=['#2563eb','#e5484d','#f5a524','#16a34a'];
+const FLAG='M-13 15L-13-15L13-7L-3 0L7 15Z';
+const SP=[
+["The candidate will recieve a formal offer once the reference checks are complete.","recieve"],
+["We can accomodate interviews on Tuesday and Wednesday mornings between ten and twelve.","accomodate"],
+["Please seperate the invoices for permanent placements from the contractor timesheets.","seperate"],
+["The bank's goverment liaison team requested an updated compliance certificate.","goverment"],
+["Each developer is responsible for maintainance of their own deployment pipeline.","maintainance"],
+["Payment is definately due within thirty days of the invoice date.","definately"],
+["The occurence of duplicate records has dropped since the migration finished.","occurence"],
+["Our client wants to persue candidates with strong accessibility experience.","persue"],
+["The staging enviroment was restored before the release window opened.","enviroment"],
+["Second-round interviews will be held in the conferance room on the fourth floor.","conferance"]];
+const PAIRS=[['O','Q'],['E','F'],['8','B'],['0','O'],['1','l'],['5','S'],['P','R'],['C','G']];
+let spellPool=[],charPool=[];
+
+function tRecord(){
+  const f=pick(FIRST),l=pick(LAST);
+  const rec={Name:f+' '+l,IBAN:'AE'+digits(2)+' '+digits(4)+' '+digits(4)+' '+digits(4)+' '+digits(4)+' '+digits(3),Email:(f+'.'+l).toLowerCase()+'@'+pick(['gmail.com','outlook.com','ecb.ae']),Phone:'+971 5'+ri(0,8)+' '+digits(3)+' '+digits(4)};
+  const keys=Object.keys(rec),k=R()<0.2?-1:ri(0,3),b={...rec};
+  if(k>=0)b[keys[k]]=mutate(rec[keys[k]]);
+  const card=(t,r)=>`<div class="rec"><h4>${t}</h4>${keys.map(x=>`<p><span>${x}</span><b>${esc(r[x])}</b></p>`).join('')}</div>`;
+  return {sec:'Written',q:'Compare the two records. Which field is different?',body:`<div class="two">${card('CRM record',rec)}${card('Signed contract',b)}</div>`,opts:[...keys,'No difference'],ans:k<0?4:k};
+}
+function tCodes(){
+  const L='ABCDEFGHJKMNPRSTUVWXYZ',cc=()=>L[ri(0,L.length-1)];
+  const a=Array.from({length:6},()=>'ECB-'+digits(5)+'-'+cc()+cc());
+  const n=ri(0,3),idx=shuf([0,1,2,3,4,5]).slice(0,n),b=a.map((x,i)=>idx.includes(i)?mutate(x):x);
+  const rows=a.map((x,i)=>`<tr><td>${i+1}</td><td class="mono">${esc(x)}</td><td class="mono">${esc(b[i])}</td></tr>`).join('');
+  return {sec:'Written',q:'How many rows have a different reference in System B than in System A?',body:`<div class="scroll"><table><thead><tr><th>Row</th><th>System A</th><th>System B</th></tr></thead><tbody>${rows}</tbody></table></div>`,opts:['0','1','2','3','4'],ans:n};
+}
+function tSpell(){
+  const [s,w]=spellPool.pop();
+  const words=[...new Set(s.replace(/[.,]/g,'').split(' ').filter(x=>x.length>=6&&x!==w&&!x.includes("'")))];
+  const o=shuf([w,...shuf(words).slice(0,3)]);
+  return {sec:'Written',q:'Which word in this sentence is spelled incorrectly?',body:`<blockquote>${esc(s)}</blockquote>`,opts:o.map(esc),ans:o.indexOf(w)};
+}
+function tAlpha(){
+  const pool=['Al Marri','Al Mansoori','Al Maktoum','Al Mazrouei','Al Mahmoud','Al Mehairi','Al Mualla','Al Madani'];
+  const six=shuf(pool).slice(0,6),sorted=six.slice().sort((a,b)=>a.localeCompare(b,'en')),pos=ri(2,5),ansName=sorted[pos-1];
+  const ord=['1st','2nd','3rd','4th','5th','6th'];
+  const o=new Set([ansName,sorted[pos-2],sorted[pos]]);
+  for(const x of shuf(six)){if(o.size<4)o.add(x)}
+  const opts=shuf([...o]);
+  return {sec:'Written',q:`If you sort these surnames from A to Z, which one comes ${ord[pos-1]}?`,body:`<blockquote>${six.map(esc).join(', ')}</blockquote>`,opts:opts.map(esc),ans:opts.indexOf(ansName)};
+}
+function tInvoice(){
+  const roles=shuf(['Senior Next.js Developer','React Native Developer','Data Engineer','QA Automation Engineer','Scrum Master','Azure DevOps Engineer']).slice(0,5);
+  const w=ri(0,4),fmt=n=>n.toLocaleString('en-US');
+  const rows=roles.map((r,i)=>{const d=ri(15,22),rate=ri(9,19)*100+pick([0,50]),t=d*rate;let shown=t;
+    if(i===w){const s=String(t),c=[];for(let j=0;j<s.length-1;j++)if(s[j]!==s[j+1])c.push(j);const j=pick(c);shown=+(s.slice(0,j)+s[j+1]+s[j]+s.slice(j+2))}
+    return `<tr><td>${i+1}</td><td>${esc(r)}</td><td class="n">${d}</td><td class="n">${fmt(rate)}</td><td class="n">${fmt(shown)}</td></tr>`}).join('');
+  return {sec:'Written',q:'One line total on this timesheet invoice is wrong. Which line?',body:`<div class="scroll"><table><thead><tr><th>Line</th><th>Role</th><th class="n">Days</th><th class="n">Day rate (AED)</th><th class="n">Total (AED)</th></tr></thead><tbody>${rows}</tbody></table></div>`,opts:[1,2,3,4,5].map(n=>'Line '+n),ans:w};
+}
+function tConfig(){
+  const base=['{','  "appName": "ecb-portal",','  "port": 3000,','  "apiBase": "/api/v1",','  "locale": "en-AE",','  "cacheSeconds": 300,','  "featureFlags": ["dark-mode", "uae-pass"]','}'];
+  const alt=[null,'  "appName": "ecb-portaI",','  "port": 3001,','  "apiBase": "/api/vl",','  "locale": "en-EA",','  "cacheSeconds": 3000,','  "featureFlags": ["dark-mode", "uae_pass"]'];
+  const m=ri(1,6),b=base.slice();b[m]=alt[m];
+  const pre=ls=>`<pre>${ls.map((l,i)=>`<span class="ln">${i+1}</span>${esc(l)}`).join('\n')}</pre>`;
+  return {sec:'Written',q:'These two config files should be identical. Which line in File B is different?',body:`<div class="two"><div><h4>File A</h4>${pre(base)}</div><div><h4>File B</h4>${pre(b)}</div></div>`,opts:[2,3,4,5,6,7].map(n=>'Line '+n),ans:m-1};
+}
+function tEmail(){
+  const f=pick(FIRST),l=pick(LAST),ok=(f+'.'+l).toLowerCase()+'@ecb.ae',lf=f.toLowerCase(),ll=l.toLowerCase(),j=ri(1,ll.length-2);
+  const ds=shuf([ok.replace('@ecb.ae','@ecb.ea'),lf+'_'+ll+'@ecb.ae',lf+'.'+ll.slice(0,j)+ll.slice(j+1)+'@ecb.ae',f+'.'+ll+'@ecb.ae',ok.replace('@ecb.ae','@ebc.ae'),lf[1]+lf[0]+lf.slice(2)+'.'+ll+'@ecb.ae']);
+  const o=new Set([ok]);for(const d of ds){if(o.size<4&&d!==ok)o.add(d)}
+  const opts=shuf([...o]);
+  return {sec:'Written',q:`ECB email addresses follow the format firstname.lastname@ecb.ae, all lowercase. Which address is correct for ${esc(f+' '+l)}?`,body:'',opts:opts.map(x=>`<span class="mono">${esc(x)}</span>`),ans:opts.indexOf(ok)};
+}
+function tDup(){
+  const ids=new Set([String(ri(20000,29999))]);
+  while(ids.size<7)ids.add(mutate(pick([...ids])));
+  const arr0=[...ids].map(x=>'INV-'+x);
+  const arr=arr0,dup=pick(arr),list=shuf([...arr,dup]);
+  const o=shuf([dup,...shuf(arr.filter(x=>x!==dup)).slice(0,3)]);
+  return {sec:'Written',q:'Exactly one invoice number appears twice in this list. Which one?',body:`<blockquote class="mono">${list.map(esc).join('<br>')}</blockquote>`,opts:o.map(x=>`<span class="mono">${esc(x)}</span>`),ans:o.indexOf(dup)};
+}
+function vChars(){
+  const [x,y]=charPool.pop(),odd=ri(0,69);
+  const cells=Array.from({length:70},(_,i)=>`<button class="cell ch" data-i="${i}">${esc(i===odd?y:x)}</button>`).join('');
+  return {sec:'Visual',q:'Every character in this grid is the same except one. Click the different one.',body:`<div class="grid" style="--c:10;max-width:600px">${cells}</div>`,click:true,ans:odd};
+}
+function vColour(){
+  const a=Array.from({length:36},()=>ri(0,3)),k=ri(0,35),b=a.slice();b[k]=(a[k]+ri(1,3))%4;
+  const A=a.map(c=>`<div class="sw" style="background:${PAL[c]}"></div>`).join('');
+  const B=b.map((c,i)=>`<button class="sw" data-i="${i}" style="background:${PAL[c]}" aria-label="Square ${i+1}"></button>`).join('');
+  return {sec:'Visual',q:'One square in Grid B is a different colour from the same square in Grid A. Click it in Grid B.',body:`<div class="two"><div><h4>Grid A</h4><div class="grid" style="--c:6;max-width:300px">${A}</div></div><div><h4>Grid B (click here)</h4><div class="grid" style="--c:6;max-width:300px">${B}</div></div></div>`,click:true,ans:k};
+}
+function vShape(){
+  const a=ri(0,7)*45,odd=ri(0,15),mir=R()<.5,d=pick([18,-18]);
+  const cells=Array.from({length:16},(_,i)=>{const r=(i===odd&&!mir)?a+d:a,m=(i===odd&&mir)?' scale(-1,1)':'';return `<button class="cell" data-i="${i}" aria-label="Shape ${i+1}"><svg viewBox="-20 -20 40 40"><path d="${FLAG}" transform="rotate(${r})${m}"/></svg></button>`}).join('');
+  return {sec:'Visual',q:'All of these shapes are identical except one, which is flipped or turned slightly. Click it.',body:`<div class="grid" style="--c:4;max-width:420px">${cells}</div>`,click:true,ans:odd};
+}
+function vCount(){
+  const cells=shuf([...Array(60).keys()]).slice(0,30),up=ri(6,11),down=ri(4,7);
+  const shapes=cells.map((c,k)=>{const t=k<up?'u':k<up+down?'d':pick(['c','s']),x=(c%10)*40+20+ri(-5,5),y=Math.floor(c/10)*40+20+ri(-5,5),s=ri(10,14),col=pick(PAL);
+    if(t==='c')return `<circle cx="${x}" cy="${y}" r="${s}" fill="${col}"/>`;
+    if(t==='s')return `<rect x="${x-s}" y="${y-s}" width="${2*s}" height="${2*s}" fill="${col}" transform="rotate(${ri(-15,15)} ${x} ${y})"/>`;
+    const p=t==='u'?`M${x} ${y-s}L${x+s} ${y+s*.8}L${x-s} ${y+s*.8}Z`:`M${x} ${y+s}L${x+s} ${y-s*.8}L${x-s} ${y-s*.8}Z`;
+    return `<path d="${p}" fill="${col}"/>`}).join('');
+  const o=new Set([up]);for(const v of shuf([up-2,up-1,up+1,up+2])){if(o.size<4)o.add(v)}
+  const opts=[...o].sort((a,b)=>a-b);
+  return {sec:'Visual',q:'How many triangles pointing <b>up</b> are in this picture?',body:`<svg class="pic" viewBox="0 0 400 240" role="img" aria-label="Shapes">${shapes}</svg>`,opts:opts.map(String),ans:opts.indexOf(up)};
+}
+function vUI(){
+  const p={btn:'Sign in',ph:'name@company.ae',link:'Forgot password?',radius:10,label:'Email address',chk:'Keep me signed in',logo:'#2563eb'};
+  const alt={btn:'Sign In',ph:'name@company.com',link:'Forgot password',radius:2,label:'Email adress',chk:'Keep me logged in',logo:'#1e3a8a'};
+  const names={btn:'Button text',ph:'Placeholder text',link:'Link text',radius:'Button corners',label:'Field label',chk:'Checkbox text',logo:'Logo colour'};
+  const keys=Object.keys(p),k=pick(keys),q={...p};q[k]=alt[k];
+  const mock=(t,v)=>`<div><h4>${t}</h4><div class="mock"><div class="logo"><i style="background:${v.logo}"></i>ECB Portal</div><label>${v.label}</label><div class="inp">${v.ph}</div><label>Password</label><div class="inp">••••••••</div><div class="chk"><span></span>${v.chk}</div><div class="btn" style="border-radius:${v.radius}px">${v.btn}</div><span class="lk">${v.link}</span></div></div>`;
+  const o=shuf([k,...shuf(keys.filter(x=>x!==k)).slice(0,3)]);
+  return {sec:'Visual',q:'The developer was asked to copy Design A exactly. What is different in Build B?',body:`<div class="two">${mock('Design A',p)}${mock('Build B',q)}</div>`,opts:o.map(x=>names[x]),ans:o.indexOf(k)};
+}
+function vSeq(){
+  const st=ri(0,7)*45,step=pick([45,90,-45]);
+  const fr=(r,solid)=>`<svg viewBox="-20 -20 40 40"><path d="${FLAG}" transform="rotate(${r})" ${solid?'fill="currentColor"':'fill="none" stroke="currentColor" stroke-width="2.5"'}/></svg>`;
+  const frames=[0,1,2,3].map(i=>`<div class="fr">${fr(st+i*step,i%2===0)}</div>`).join('')+'<div class="fr q">?</div>';
+  const c=[[st+4*step,1],[st+5*step,1],[st+4*step,0],[st+3*step,0]],order=shuf([0,1,2,3]);
+  return {sec:'Visual',q:'Which shape comes next in the sequence?',body:`<div class="seq">${frames}</div>`,opts:order.map(i=>fr(c[i][0],c[i][1])),pics:true,ans:order.indexOf(0)};
+}
+function vPattern(){
+  const on=shuf([...Array(16).keys()]).slice(0,6),key=a=>a.slice().sort((x,y)=>x-y).join();
+  const g=s=>`<svg viewBox="0 0 80 80" class="mini">${[...Array(16).keys()].map(k=>`<rect x="${(k%4)*20+3}" y="${Math.floor(k/4)*20+3}" width="14" height="14" rx="3" ${s.includes(k)?'fill="currentColor"':'fill="none" stroke="currentColor" stroke-opacity=".35"'}/>`).join('')}</svg>`;
+  const seen=new Set([key(on)]),vars=[];
+  for(let t=0;t<200&&vars.length<3;t++){const rm=pick(on),nb=[rm-4,rm+4,rm%4?rm-1:-1,rm%4<3?rm+1:-1].filter(x=>x>=0&&x<16&&!on.includes(x));
+    const off=[...Array(16).keys()].filter(x=>!on.includes(x)),ad=nb.length?pick(nb):pick(off),v=on.filter(x=>x!==rm).concat(ad);
+    if(!seen.has(key(v))){seen.add(key(v));vars.push(v)}}
+  const all=[on,...vars],order=shuf([0,1,2,3]);
+  return {sec:'Visual',q:'Which option is an exact copy of the original pattern?',body:`<div class="pat"><div><h4>Original</h4>${g(on)}</div></div>`,opts:order.map(i=>g(all[i])),pics:true,ans:order.indexOf(0)};
+}
+const PLAN=[tRecord,tRecord,tCodes,tSpell,tSpell,tAlpha,tInvoice,tConfig,tEmail,tDup,vChars,vChars,vColour,vColour,vShape,vShape,vCount,vUI,vSeq,vPattern];
+function build(){spellPool=shuf(SP);charPool=shuf(PAIRS);return shuf(PLAN).map(g=>g())}
+//GEN-END
+
+const fnv=s=>{let h=0x811c9dc5;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,0x01000193)>>>0}return h};
+const sig=(n,sc,secs,r)=>fnv(n.trim().toLowerCase()+'|'+sc+'|'+secs+'|'+r+'|'+SALT).toString(36).toUpperCase().padStart(7,'0');
+const mkCode=(n,sc,secs,r)=>`S${sc}T${secs}F${r}-${sig(n,sc,secs,r)}`;
+const REASON=['','switched tabs or minimised the window','clicked outside the test window','left full screen mode','tried to open developer tools','tried to take a screenshot','reloaded or closed the page'];
+const mmss=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+const app=document.getElementById('app');
+const KEY='lnk-atd-v2';
+let S={phase:'start'};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(_){}};
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(_){return null}};
+
+function result(){
+  const ok=S.qs.map((q,k)=>S.ans[k]===q.ans),sc=ok.filter(Boolean).length;
+  const part=n=>S.qs.reduce((a,q,k)=>a+(q.sec===n&&ok[k]?1:0),0);
+  return {sc,w:part('Written'),v:part('Visual'),code:mkCode(S.name,sc,S.secs,S.reason||0),marks:ok.map(x=>x?'1':'0').join('')};
+}
+function send(event){
+  if(!RESULTS_URL)return;
+  const d={event,name:S.name,email:S.email,started:new Date(S.t0).toISOString(),ua:navigator.userAgent};
+  if(event==='finished'){const r=result();Object.assign(d,{status:S.reason?'FAILED: '+REASON[S.reason]:(r.sc>=PASS?'PASS':'BELOW PASS MARK'),score:r.sc,written:r.w,visual:r.v,secs:S.secs,reason:REASON[S.reason||0],code:r.code,answers:r.marks,finished:new Date(S.tEnd).toISOString()})}
+  try{fetch(RESULTS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(d),keepalive:true}).catch(()=>{})}catch(_){}
+}
+function viewStart(){
+  return `<section class="band head"><div class="wrap"><p class="brand">Linnk</p><h1>Attention to detail assessment</h1><p class="lead">This test checks how carefully you read, compare and spot differences. Half the questions are written, half are visual.</p><div class="facts"><div><span class="big">20</span>questions</div><div><span class="big">15 min</span>time limit</div><div><span class="big">75%</span>pass mark</div></div></div></section>
+  <main class="wrap"><div class="startgrid"><div><h2>Strict rules, please read</h2><ul class="rules"><li><b>The test ends immediately and is marked as a fail if you</b> switch tabs, click outside this window, minimise it, leave full screen, reload the page, or try to take a screenshot.</li><li>Before you start, close other apps and turn on Do Not Disturb so no pop-up takes you away from the page.</li><li>You get one attempt. The timer does not pause and you cannot go back to a question.</li><li>Copy, paste and right-click are switched off.</li><li>Use a laptop or desktop. Your questions are generated just for you.</li><li>At the end you get a result code. Your Linnk consultant also receives your result.</li></ul></div>
+  <form id="f" novalidate><label for="nm">Full name</label><input id="nm" type="text" autocomplete="name"><label for="em">Email</label><input id="em" type="email" autocomplete="email"><label class="agree"><input id="ag" type="checkbox">I have read the rules and will complete this test on my own in one sitting.</label><p class="err" id="err"></p><button class="go" type="submit">Start the test</button></form></div>
+  <p class="small" style="margin-top:40px"><a href="#verify">For recruiters: check a result code</a></p></main>`;
+}
+function viewQ(){
+  const q=S.qs[S.i],last=S.i===TOTAL-1;
+  const opts=q.click?'':`<div class="opts${q.pics?' pics':''}">${q.opts.map((o,k)=>`<button class="opt${S.sel===k?' on':''}" data-o="${k}">${o}</button>`).join('')}</div>`;
+  return `<section class="band head slim"><div class="wrap"><div class="bar"><div><p class="brand">Question ${S.i+1} of ${TOTAL}</p><p class="sec">${q.sec}</p></div><div id="clock" class="clock">15:00</div></div></div><div class="prog"><i style="width:${S.i/TOTAL*100}%"></i></div></section>
+  <main class="wrap test"><h2>${q.q}</h2><div id="qb">${q.body}</div>${opts}<div class="nav"><button class="go" id="next"${S.sel==null?' disabled':''}>${last?'Finish':'Next question'}</button></div></main>`;
+}
+function viewDone(){
+  const r=result(),failed=!!S.reason,pass=!failed&&r.sc>=PASS,date=new Date(S.tEnd).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'});
+  const top=failed?`<p class="brand">Test ended, ${esc(S.name)}</p><h1><span class="big" style="font-size:clamp(48px,8vw,80px)">Test failed</span></h1><p class="lead">The test stopped because you ${REASON[S.reason]}. This has been recorded.</p>`
+    :`<p class="brand">Test complete, ${esc(S.name)}</p><h1><span class="big" style="font-size:clamp(56px,10vw,96px)">${r.sc} / ${TOTAL}</span></h1><p class="lead">${pass?'Above':'Below'} the 75% pass mark. Thank you for completing the assessment.</p>`;
+  return `<section class="band head"${failed?' style="background:#ffd0d2"':''}><div class="wrap">${top}</div></section>
+  <main class="wrap"><div class="stats"><div><span>Written</span><b>${r.w} / 10</b></div><div><span>Visual</span><b>${r.v} / 10</b></div><div><span>Time taken</span><b>${mmss(S.secs)}</b></div><div><span>Reached question</span><b>${Math.min(S.i+1,TOTAL)} / ${TOTAL}</b></div></div>
+  <h2>Your result code</h2><p>${RESULTS_URL?'Your result has been sent to Linnk. Keep this code for your records.':'Copy your result and send it to your Linnk consultant by email or WhatsApp. A screenshot of this screen also works.'}</p><div class="code" id="code">${r.code}</div>
+  <div class="row"><button class="go" id="copy">Copy result</button><span class="small" id="cmsg"></span></div><div id="fallback"></div><p class="small">Completed ${esc(date)}</p></main>`;
+}
+function viewVerify(){
+  return `<section class="band head"><div class="wrap"><p class="brand">Linnk, recruiter use</p><h1>Check a result code</h1><p class="lead">Enter the candidate's full name exactly as they typed it, and the code they sent you. A valid code means the result has not been edited.</p></div></section>
+  <main class="wrap"><form id="vf" novalidate style="max-width:520px"><label for="vn">Candidate full name</label><input id="vn" type="text"><label for="vc">Result code</label><input id="vc" type="text" placeholder="S17T642F0-1A2B3C4" autocapitalize="characters"><button class="go" type="submit">Check code</button><div id="vout"></div></form><p class="small" style="margin-top:40px"><a href="#">Back to the test</a></p></main>`;
+}
+function render(){
+  save();
+  if(location.hash==='#verify'){app.innerHTML=viewVerify();return}
+  app.innerHTML=S.phase==='test'?viewQ():S.phase==='done'?viewDone():viewStart();
+  tick();window.scrollTo(0,0);
+}
+function remain(){return Math.max(0,LIMIT-Math.floor((Date.now()-S.t0)/1000))}
+function tick(){
+  if(S.phase!=='test')return;
+  const r=remain(),c=document.getElementById('clock');
+  if(c){c.textContent=mmss(r);c.classList.toggle('low',r<120)}
+  if(r<=0)finish();
+}
+function finish(){
+  if(S.phase!=='test')return;
+  S.tEnd=Date.now();S.secs=Math.min(LIMIT,Math.round((S.tEnd-S.t0)/1000));S.phase='done';
+  try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(_){}
+  render();send('finished');
+}
+function violate(r){
+  if(S.phase!=='test'||Date.now()<(S.grace||0))return;
+  S.reason=r;finish();
+}
+function choose(n){
+  S.sel=n;
+  document.querySelectorAll('#qb [data-i],[data-o]').forEach(el=>el.classList.toggle('on',+(el.dataset.i??el.dataset.o)===n));
+  const b=document.getElementById('next');if(b)b.disabled=false;
+}
+document.addEventListener('submit',e=>{
+  e.preventDefault();
+  if(e.target.id==='f'){
+    const n=document.getElementById('nm').value.trim(),m=document.getElementById('em').value.trim(),ag=document.getElementById('ag').checked,err=document.getElementById('err');
+    if(n.length<3){err.textContent='Please enter your full name.';return}
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m)){err.textContent='Please enter a valid email address.';return}
+    if(!ag){err.textContent='Please tick the box to confirm.';return}
+    S={phase:'test',name:n,email:m,qs:build(),i:0,ans:[],sel:null,t0:Date.now(),reason:0,fs:false,grace:Date.now()+2000};
+    try{const pr=document.documentElement.requestFullscreen?.();if(pr)pr.then(()=>{S.fs=true;S.grace=Date.now()+1000;save()}).catch(()=>{})}catch(_){}
+    render();send('started');
+  }
+  if(e.target.id==='vf'){
+    const n=document.getElementById('vn').value,c=document.getElementById('vc').value.trim().toUpperCase(),out=document.getElementById('vout');
+    const mt=c.match(/^S(\d+)T(\d+)F(\d+)-([0-9A-Z]+)$/);
+    if(!mt||!n.trim()){out.innerHTML='<p class="verdict bad">That code is not in the right format.</p>';return}
+    const sc=+mt[1],r=+mt[3],valid=sig(n,sc,+mt[2],r)===mt[4];
+    out.innerHTML=valid?`<p class="verdict ok">Valid result</p><div class="stats" style="margin-top:12px"><div><span>Score</span><b>${sc} / ${TOTAL}</b></div><div><span>Time taken</span><b>${mmss(+mt[2])}</b></div><div><span>Result</span><b>${r?'Failed':sc>=PASS?'Pass':'Below mark'}</b></div></div>${r?`<p>Test stopped because the candidate ${esc(REASON[r]||'broke a rule')}.</p>`:''}`:'<p class="verdict bad">Not valid. The name does not match or the code was changed.</p>';
+  }
+});
+document.addEventListener('click',e=>{
+  if(S.phase==='test'){
+    const c=e.target.closest('#qb [data-i]');if(c&&S.qs[S.i].click){choose(+c.dataset.i);return}
+    const o=e.target.closest('[data-o]');if(o){choose(+o.dataset.o);return}
+    if(e.target.closest('#next')&&S.sel!=null){S.ans[S.i]=S.sel;S.sel=null;S.i++;if(S.i>=TOTAL)finish();else render();return}
+  }
+  if(e.target.closest('#copy')){
+    const r=result(),txt=`Attention to detail assessment\nCandidate: ${S.name} (${S.email})\nStatus: ${S.reason?'FAILED, '+REASON[S.reason]:(r.sc>=PASS?'Pass':'Below pass mark')}\nScore: ${r.sc}/${TOTAL} (${Math.round(r.sc/TOTAL*100)}%)\nWritten: ${r.w}/10, Visual: ${r.v}/10\nTime taken: ${mmss(S.secs)}\nCompleted: ${new Date(S.tEnd).toISOString()}\nResult code: ${r.code}`;
+    const msg=document.getElementById('cmsg');
+    const fb=()=>{const f=document.getElementById('fallback');f.innerHTML='<textarea id="ta" readonly></textarea>';const t=document.getElementById('ta');t.value=txt;t.select();msg.textContent='Select all and copy the text below.'};
+    try{navigator.clipboard.writeText(txt).then(()=>{msg.textContent='Copied. Paste it into your email or message.'},fb)}catch(_){fb()}
+  }
+});
+['copy','cut','paste','contextmenu','dragstart','selectstart'].forEach(t=>document.addEventListener(t,e=>{if(S.phase==='test')e.preventDefault()}));
+document.addEventListener('keydown',e=>{
+  if(S.phase!=='test')return;
+  const k=(e.key||'').toLowerCase(),mod=e.ctrlKey||e.metaKey;
+  if(k==='f12'||(mod&&e.shiftKey&&['i','j','c'].includes(k))||(mod&&e.altKey&&['i','j','c'].includes(k))||(mod&&k==='u')){e.preventDefault();violate(4);return}
+  if(k==='printscreen'||(e.metaKey&&e.shiftKey&&['3','4','5','s'].includes(k))){e.preventDefault();violate(5);return}
+  if(mod&&['c','x','v','a','p','s','f','g'].includes(k))e.preventDefault();
+});
+document.addEventListener('keyup',e=>{if(S.phase==='test'&&(e.key||'').toLowerCase()==='printscreen')violate(5)});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)violate(1)});
+window.addEventListener('blur',()=>{setTimeout(()=>{if(!document.hasFocus())violate(document.hidden?1:2)},150)});
+document.addEventListener('fullscreenchange',()=>{if(S.phase==='test'&&S.fs&&!document.fullscreenElement)violate(3)});
+window.addEventListener('pagehide',()=>{if(S.phase==='test'){S.reason=6;S.tEnd=Date.now();S.secs=Math.min(LIMIT,Math.round((S.tEnd-S.t0)/1000));S.phase='done';save();send('finished')}});
+window.addEventListener('hashchange',render);
+const start=d=>{
+  if(d&&d.phase)S=d;
+  else{const st=load();if(st&&st.phase==='test'){S=st;S.reason=6;S.grace=0;finish()}else if(st&&st.phase==='done')S=st}
+  render();setInterval(tick,500);
+};
+window.claude?.hot?.snapshot?.(()=>S);
+window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
+}
+</script>
+</body>
+</html>
