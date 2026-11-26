@@ -178,37 +178,20 @@ async function post(action,data,tries=3){
 }
 function beacon(reason){
   if(!S.id)return;
-  const body=JSON.stringify(Object.assign({action:'fail',id:S.id,reason},S.code?{code:S.code,expl:S.expl,tel:S.tel,cam:S.cam||0}:{}));
+  const body=JSON.stringify(Object.assign({action:'fail',id:S.id,reason},S.code?{code:S.code,expl:S.expl,tel:S.tel}:{}));
   try{if(navigator.sendBeacon&&navigator.sendBeacon(API,new Blob([body],{type:'text/plain;charset=utf-8'})))return}catch(_){}
   try{fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body,keepalive:true}).catch(()=>{})}catch(_){}
 }
 
-let CAM=null,camTimer=null;
-async function camOn(){
-  if(CAM&&CAM.active)return true;
-  try{const st=await navigator.mediaDevices.getUserMedia({video:{width:320,height:240,facingMode:'user'},audio:false});
-    CAM=st;let v=document.getElementById('camv');if(!v){v=document.createElement('video');v.id='camv';v.muted=true;v.playsInline=true;v.autoplay=true;document.body.appendChild(v)}
-    v.srcObject=st;try{await v.play()}catch(_){}
-    st.getVideoTracks()[0].addEventListener('ended',()=>{S.cam=(S.cam||0)+1;});
-    return true}catch(_){return false}
-}
-function snap(tag){
-  if(!live()||!CAM)return;
-  const v=document.getElementById('camv');
-  if(!CAM.active||!v||!v.videoWidth){S.cam=(S.cam||0)+1;camOn();return}
-  const c=document.createElement('canvas');c.width=320;c.height=240;c.getContext('2d').drawImage(v,0,0,320,240);
-  post('snap',{id:S.id,img:c.toDataURL('image/jpeg',0.6),tag:tag||''},1);
-}
-function scheduleSnaps(){clearTimeout(camTimer);const go=()=>{snap();camTimer=setTimeout(go,50000+Math.random()*25000)};camTimer=setTimeout(go,4000)}
 let EDLOAD=null;
 function loadEditor(){if(EDLOAD)return EDLOAD;EDLOAD=new Promise(r=>{const sc=document.createElement('script');sc.src='editor.js?v=1';sc.onload=()=>r(!!window.LnkEditor);sc.onerror=()=>r(false);document.head.appendChild(sc)});return EDLOAD}
 const head=(t,sub,bg)=>`<section class="band head"${bg?` style="background:${bg}"`:''}><div class="wrap"><p class="brand">${sub||'Linnk'}</p><h1>${t}</h1></div></section>`;
 function viewStart(){
   const opts=Object.entries(ROLES).map(([k,r])=>`<option value="${k}">${esc(r.name)}</option>`).join('');
   return `<section class="band head"><div class="wrap"><p class="brand">Linnk</p><h1>Candidate assessment</h1><p class="lead">Two timed parts taken in one sitting. Part 1 checks how carefully you read, compare and spot differences. Part 2 is hands-on coding for the role you applied for.</p><div class="facts"><div><span class="big">2</span>parts</div><div><span class="big">65 min</span>total (20 + 45)</div><div><span class="big">1</span>attempt</div></div></div></section>
-  <main class="wrap"><div class="startgrid"><div><h2>Strict rules, please read</h2><ul class="rules"><li><b>The test ends immediately and is marked as a fail if you</b> switch tabs, click outside this window, minimise it, leave full screen, reload the page, or try to take a screenshot.</li><li>Before you start, close other apps and chat windows and turn on Do Not Disturb so no pop-up takes you away from the page.</li><li>You get one attempt per email address. Timers do not pause and you cannot go back to a question.</li><li>In part 1 a question only scores if your whole answer is right. If there are three differences, you must find all three and nothing else.</li><li>In part 2 you write code in the browser. Pasting is switched off, so type your own solution. Your code is saved automatically and reviewed by the hiring team.</li><li>Copy, paste and right-click are switched off.</li><li>Use a laptop or desktop with Chrome, Edge or Firefox and a stable internet connection. Your questions are generated just for you.</li><li>Do not use AI tools, search engines, other devices or other people. Your answers and code will be discussed in the interview.</li><li><b>Webcam:</b> your camera must stay on. A photo is taken about once a minute and shared only with Linnk's hiring team for this role. Photos are deleted within 90 days.</li><li>Your answers are sent to Linnk when you finish. Your consultant will be in touch with the outcome.</li></ul>
-  <h3>The two parts</h3><div class="parts"><div><b>Part 1: Attention to detail</b>20 questions, 20 minutes. Find every difference or mistake by clicking it. Some questions have none.</div><div><b>Part 2: Hands-on coding</b>3 tasks, 45 minutes, in the role's own language. Move between tasks freely. Working, clean, well-handled code scores best.</div></div></div>
-  <form id="f" novalidate><label for="rl">Role you applied for</label><select id="rl"><option value="">Select your role</option>${opts}</select><label for="nm">Full name</label><input id="nm" type="text" autocomplete="name"><label for="em">Email (the one you applied with)</label><input id="em" type="email" autocomplete="email"><label>Camera check</label><div class="camrow"><button class="go ghost" type="button" id="camb">Turn on camera</button><span class="small" id="camm">Required. Your camera stays on during the test.</span></div><label class="agree"><input id="ag" type="checkbox">I have read the rules, I agree to webcam photos being taken during the test, and I will complete it on my own in one sitting.</label><p class="err" id="err"></p><button class="go" type="submit" id="sb">Start the test</button></form></div></main>`;
+  <main class="wrap"><div class="startgrid"><div><h2>Strict rules, please read</h2><ul class="rules"><li><b>The test ends immediately and is marked as a fail if you</b> switch tabs, click outside this window, minimise it, leave full screen, reload the page, or try to take a screenshot.</li><li>Before you start, close other apps and chat windows and turn on Do Not Disturb so no pop-up takes you away from the page.</li><li>You get one attempt per candidate code. Timers do not pause and you cannot go back to a question.</li><li>In part 1 a question only scores if your whole answer is right. If there are three differences, you must find all three and nothing else.</li><li>In part 2 you write code in the browser. Pasting is switched off, so type your own solution. Your code is saved automatically and reviewed by the hiring team.</li><li>Copy, paste and right-click are switched off.</li><li>Use a laptop or desktop with Chrome, Edge or Firefox and a stable internet connection. Your questions are generated just for you.</li><li>Do not use AI tools, search engines, other devices or other people. Your answers and code will be discussed in the interview.</li><li>Your answers are sent to Linnk when you finish. Your consultant will be in touch with the outcome.</li></ul>
+  <h3>Privacy note</h3><p class="small">This assessment is used by your recruiter to check your fit for the role. Your answers are stored against your candidate code, together with the name and email your recruiter already holds, on secure servers, and are deleted automatically within 60 days. Your code may be reviewed with the help of AI tools. To have your answers deleted sooner, tell your recruiter.</p><h3>The two parts</h3><div class="parts"><div><b>Part 1: Attention to detail</b>20 questions, 20 minutes. Find every difference or mistake by clicking it. Some questions have none.</div><div><b>Part 2: Hands-on coding</b>3 tasks, 45 minutes, in the role's own language. Move between tasks freely. Working, clean, well-handled code scores best.</div></div></div>
+  <form id="f" novalidate><label for="cc">Your candidate code</label><input id="cc" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. NX-7K4Q" style="text-transform:uppercase;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em"><p class="small" style="margin-top:-8px">Your recruiter sent you this code. It also sets which role you are tested for.</p><label class="agree"><input id="ag" type="checkbox">I have read the rules and the privacy note, and I will complete this test on my own in one sitting.</label><p class="err" id="err"></p><button class="go" type="submit" id="sb">Start the test</button></form></div></main>`;
 }
 function curQs(){return S.part===1?S.qs1:S.qs2}
 function cq(){return curQs()[S.i]}
@@ -261,7 +244,7 @@ function mountEditor(){
   }
 }
 function switchTask(i){const ta=document.querySelector('textarea.editor');if(ta)S.code[S.ti]=ta.value;const ex=document.getElementById('ex');if(ex)S.expl[S.ti]=ex.value;S.ti=i;autosave();render()}
-async function autosave(){if(S.phase!=='code')return;S.lastSave=Date.now();const r=await post('save',{id:S.id,code:S.code,expl:S.expl,tel:S.tel,cam:S.cam||0},1);const el=document.getElementById('saved');if(el)el.textContent=r.ok?'Saved '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):'Not saved yet, retrying'}
+async function autosave(){if(S.phase!=='code')return;S.lastSave=Date.now();const r=await post('save',{id:S.id,code:S.code,expl:S.expl,tel:S.tel},1);const el=document.getElementById('saved');if(el)el.textContent=r.ok?'Saved '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):'Not saved yet, retrying'}
 function viewMsg(){return head(esc(S.msgTitle||'Something went wrong'))+`<main class="wrap"><p>${esc(S.msg||'')}</p></main>`}
 function render(){
   save();
@@ -306,7 +289,7 @@ async function endPart(){
     S.tasks=r.tasks;S.code=r.tasks.map(t=>t.starter);S.expl=r.tasks.map(()=>'');S.tel=r.tasks.map(()=>({keys:0,dels:0,ms:0,paste:0,peak:0,runs:0,bm:0,bc:0}));loadEditor();S.ti=0;S.limit2=r.limit;S.brk=r.brk||45;S.phase='break';S.tb=Date.now();render();
   }else{
     busy('Submitting','Sending your answers to Linnk. Do not close or leave this page.');
-    const r=await post('finish',{id:S.id,code:S.code,expl:S.expl,tel:S.tel,cam:S.cam||0,brk:S.brkUsed||0},5);
+    const r=await post('finish',{id:S.id,code:S.code,expl:S.expl,tel:S.tel,brk:S.brkUsed||0},5);
     if(S.phase!=='busy')return;
     if(r.error==='network'){S.retry='finish';S.busyMsg='We could not reach the server. Check your connection and click Try again. Do not close this page.';render();return}
     S.phase='done';S.reason=0;exitFs();render();
@@ -317,8 +300,7 @@ function startPart2(){
   S.brkUsed=Math.round((Date.now()-S.tb)/1000);
   S.phase='code';S.part=2;S.ti=0;S.t0=Date.now();S.limit=S.limit2;S.lastTick=Date.now();S.lastSave=Date.now();render();
 }
-function stopCam(){clearTimeout(camTimer);try{CAM&&CAM.getTracks().forEach(t=>t.stop())}catch(_){}const v=document.getElementById('camv');if(v)v.remove();CAM=null}
-function exitFs(){stopCam();try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(_){}}
+function exitFs(){try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(_){}}
 const live=()=>['test','break','busy','code'].includes(S.phase)&&S.id;
 function violate(r){
   if(!live()||Date.now()<(S.grace||0))return;
@@ -327,23 +309,19 @@ function violate(r){
 document.addEventListener('submit',async e=>{
   e.preventDefault();
   if(e.target.id!=='f')return;
-  const role=document.getElementById('rl').value,n=document.getElementById('nm').value.trim(),m=document.getElementById('em').value.trim(),ag=document.getElementById('ag').checked,err=document.getElementById('err'),sb=document.getElementById('sb');
-  if(!ROLES[role]){err.textContent='Please select the role you applied for.';return}
-  if(n.length<3){err.textContent='Please enter your full name.';return}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m)){err.textContent='Please enter a valid email address.';return}
+  const code=document.getElementById('cc').value.trim().toUpperCase(),ag=document.getElementById('ag').checked,err=document.getElementById('err'),sb=document.getElementById('sb');
+  if(!/^[A-Z]{2}-[A-Z0-9]{4}$/.test(code)){err.textContent='Please enter the code your recruiter sent you, for example NX-7K4Q.';return}
   if(!ag){err.textContent='Please tick the box to confirm.';return}
-  if(!CAM||!CAM.active){err.textContent='Please turn on your camera first.';return}
   sb.disabled=true;sb.textContent='Starting...';err.textContent='';
   let fs=false;try{const pr=document.documentElement.requestFullscreen?.();if(pr)pr.then(()=>{fs=true;S.fs=true;S.grace=Date.now()+1000}).catch(()=>{})}catch(_){}
   S.grace=Date.now()+60000;
-  const r=await post('start',{name:n,email:m,role});
+  const r=await post('start',{code});
   if(r.error){exitFs();sb.disabled=false;sb.textContent='Start the test';
-    err.textContent=r.error==='taken'?'Our records show this email has already taken the assessment. Contact your Linnk consultant if you need a retake.':r.error==='invalid'?'Please check your details and try again.':'We could not start the test. Check your connection and try again.';return}
-  S={phase:'test',part:1,role,name:n,email:m,id:r.id,qs1:r.qs,ans1:[],ans2:[],i:0,sel:null,t0:Date.now(),limit:r.limit,reason:0,cam:0,fs:!!document.fullscreenElement||fs,grace:Date.now()+1500};
-  render();scheduleSnaps();loadEditor();
+    err.textContent=r.error==='taken'?'This code has already been used. Contact your recruiter if you need a retake.':r.error==='badcode'?'That code was not recognised. Check it against the message from your recruiter.':'We could not start the test. Check your connection and try again.';return}
+  S={phase:'test',part:1,role:r.role,name:code,id:r.id,qs1:r.qs,ans1:[],ans2:[],i:0,sel:null,t0:Date.now(),limit:r.limit,reason:0,fs:!!document.fullscreenElement||fs,grace:Date.now()+1500};
+  render();loadEditor();
 });
 document.addEventListener('click',async e=>{
-  if(e.target.closest('#camb')){const ok=await camOn();const m=document.getElementById('camm');if(m)m.textContent=ok?'Camera is on. You can start when ready.':'Camera blocked. Allow camera access in your browser (the icon in the address bar), then click again.';if(ok)e.target.closest('#camb').textContent='Camera on';return}
   if(e.target.closest('#p2')){startPart2();return}
   if(e.target.closest('#again')){e.preventDefault();S={phase:'start'};render();return}
   if(e.target.closest('#retry')){const w=S.retry;S.retry=false;S.phase=w==='finish'?'code':'test';if(w==='part1')S.i=curQs().length-1;if(w)endPart();return}
